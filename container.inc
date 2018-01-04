@@ -237,19 +237,10 @@ forward OnItemRemovedFromContainer(containerid, slotid, playerid);
 After an item has been removed from a container.
 */
 
-
-/*==============================================================================
-
-	Setup
-
-==============================================================================*/
-
-
-enum E_CONTAINER_DATA {
+static enum E_CONTAINER_DATA {
 	cnt_name[MAX_CONTAINER_NAME],
 	cnt_size
 }
-
 
 static
 	cnt_Data[MAX_CONTAINER][E_CONTAINER_DATA],
@@ -261,18 +252,11 @@ new
 	Iterator:cnt_Index<MAX_CONTAINER>; // exported publically to facilitate iterating through containers
 
 
-/*==============================================================================
-
-	Core Functions
-
-==============================================================================*/
-
-
 stock CreateContainer(name[], size) {
 	new id = Iter_Free(cnt_Index);
 
-	if(id == INVALID_ITERATOR_SLOT) {
-		fatal("container limit reached");
+	if(id == ITER_NONE) {
+		err("container limit reached");
 		return INVALID_CONTAINER_ID;
 	}
 
@@ -280,7 +264,7 @@ stock CreateContainer(name[], size) {
 		err("attempt to create a container with invalid size",
 			_i("size", size));
 
-		size = MAX_CONTAINER_SLOTS;
+		return INVALID_CONTAINER_ID;
 	}
 
 	cnt_Data[id][cnt_name][0] = EOS;
@@ -636,18 +620,14 @@ stock GetItemContainerSlot(itemid, &slot) {
 ==============================================================================*/
 
 
-hook OnItemDestroy(itemid)
-{
-	if(cnt_ItemContainer[itemid] != INVALID_CONTAINER_ID)
-	{
+hook OnItemDestroy(itemid) {
+	if(cnt_ItemContainer[itemid] != INVALID_CONTAINER_ID) {
 		RemoveItemFromContainer(cnt_ItemContainer[itemid], cnt_ItemContainerSlot[itemid]);
 	}
 }
 
-hook OnItemCreateInWorld(itemid)
-{
-	if(cnt_ItemContainer[itemid] != INVALID_CONTAINER_ID)
-	{
+hook OnItemCreateInWorld(itemid) {
+	if(cnt_ItemContainer[itemid] != INVALID_CONTAINER_ID) {
 		RemoveItemFromContainer(cnt_ItemContainer[itemid], cnt_ItemContainerSlot[itemid]);
 	}
 }
