@@ -18,6 +18,7 @@
 
 #include <YSI\y_hooks>
 
+
 /*==============================================================================
 
 	Constant Definitions, Function Declarations and Documentation
@@ -26,18 +27,18 @@
 
 
 // Maximum amount of containers that can be created.
-#if !defined CNT_MAX
-	#define CNT_MAX (4096)
+#if !defined MAX_CONTAINER
+	#define MAX_CONTAINER (4096)
 #endif
 
 // Maximum string length for container names.
-#if !defined CNT_MAX_NAME
-	#define CNT_MAX_NAME (32)
+#if !defined MAX_CONTAINER_NAME
+	#define MAX_CONTAINER_NAME (32)
 #endif
 
 // Maximum slot size amount for containers.
-#if !defined CNT_MAX_SLOTS
-	#define CNT_MAX_SLOTS (24)
+#if !defined MAX_CONTAINER_SLOTS
+	#define MAX_CONTAINER_SLOTS (24)
 #endif
 
 
@@ -58,7 +59,7 @@ Creates a container to store items in with a static size.
 
 # Returns
 ID of the newly created container or INVALID_CONTAINER_ID if the function failed
-due to CNT_MAX limit being reached.
+due to MAX_CONTAINER limit being reached.
 */
 
 forward DestroyContainer(containerid, destroyitems = true);
@@ -97,7 +98,7 @@ Removes an item from a container slot.
 - call: If true, will call OnItemRemoveFromContainer
 */
 
-forward IsValidContainer(containerid);
+forward bool:IsValidContainer(containerid);
 /*
 # Description
 Checks if a container ID is valid.
@@ -109,10 +110,19 @@ forward GetContainerName(containerid, name[]);
 Returns a container's name.
 
 # Returns
-Boolean to indicate success or failure.
+Zero on success, non-zero if error.
 */
 
-forward GetContainerSize(containerid);
+forward SetContainerName(containerid, name[]);
+/*
+# Description
+Updates a container's name
+
+# Returns
+Zero on success, non-zero if error.
+*/
+
+forward GetContainerSize(containerid, &size);
 /*
 # Description
 Returns a container's item capacity.
@@ -124,58 +134,58 @@ forward SetContainerSize(containerid, size);
 Sets a container's item capacity.
 
 # Returns
-Boolean to indicate success or failure.
+Zero on success, non-zero if error.
 */
 
-forward GetContainerItemCount(containerid);
+forward GetContainerItemCount(containerid, &count);
 /*
 # Description
 Returns the amount of items inside a container.
 */
 
-forward GetContainerSlotItem(containerid, slotid);
+forward GetContainerSlotItem(containerid, slotid, &itemid);
 /*
 # Description
 Returns the item stored in the specified slot.
 */
 
-forward IsContainerSlotUsed(containerid, slotid);
+forward bool:IsContainerSlotUsed(containerid, slotid);
 /*
 # Description
 Checks if a slot in a container is occupied by an item.
 */
 
-forward IsContainerFull(containerid);
+forward bool:IsContainerFull(containerid);
 /*
 # Description
 Checks if a container is full.
 */
 
-forward IsContainerEmpty(containerid);
+forward bool:IsContainerEmpty(containerid);
 /*
 # Description
 Checks if a container is empty.
 */
 
-forward WillItemTypeFitInContainer(containerid, ItemType:itemtype);
+forward ContainerFitsItemType(containerid, ItemType:itemtype, &bool:result);
 /*
 # Description
 Checks if an item type will fit into a container.
 */
 
-forward GetContainerFreeSlots(containerid);
+forward GetContainerFreeSlots(containerid, &slots);
 /*
 # Description
 Returns the number of free item slots in a container.
 */
 
-forward GetItemContainer(itemid);
+forward GetItemContainer(itemid, &containerid);
 /*
 # Description
 Returns the ID of the container that itemid is stored in.
 */
 
-forward GetItemContainerSlot(itemid);
+forward GetItemContainerSlot(itemid, &slot);
 /*
 # Description
 Returns the container slot that the item is stored in if inside a container.
@@ -236,19 +246,19 @@ After an item has been removed from a container.
 
 
 enum E_CONTAINER_DATA {
-	cnt_name[CNT_MAX_NAME],
+	cnt_name[MAX_CONTAINER_NAME],
 	cnt_size
 }
 
 
 static
-	cnt_Data[CNT_MAX][E_CONTAINER_DATA],
-	cnt_Items[CNT_MAX][CNT_MAX_SLOTS],
+	cnt_Data[MAX_CONTAINER][E_CONTAINER_DATA],
+	cnt_Items[MAX_CONTAINER][MAX_CONTAINER_SLOTS],
 	cnt_ItemContainer[ITM_MAX] = {INVALID_CONTAINER_ID, ...},
 	cnt_ItemContainerSlot[ITM_MAX] = {-1, ...};
 
 new
-	Iterator:cnt_Index<CNT_MAX>; // exported publically to facilitate iterating through containers
+	Iterator:cnt_Index<MAX_CONTAINER>; // exported publically to facilitate iterating through containers
 
 
 /*==============================================================================
@@ -266,17 +276,18 @@ stock CreateContainer(name[], size) {
 		return INVALID_CONTAINER_ID;
 	}
 
-	if(size > CNT_MAX_SLOTS || size <= 0) {
+	if(size > MAX_CONTAINER_SLOTS || size <= 0) {
 		err("attempt to create a container with invalid size",
 			_i("size", size));
 
-		size = CNT_MAX_SLOTS;
+		size = MAX_CONTAINER_SLOTS;
 	}
 
-	strcpy(cnt_Data[id][cnt_name], name, CNT_MAX_NAME);
+	cnt_Data[id][cnt_name][0] = EOS;
+	strcat(cnt_Data[id][cnt_name], name, MAX_CONTAINER_NAME);
 	cnt_Data[id][cnt_size] = size;
 
-	for(new i; i < CNT_MAX_SLOTS; i++) {
+	for(new i; i < MAX_CONTAINER_SLOTS; i++) {
 		cnt_Items[id][i] = INVALID_ITEM_ID;
 	}
 
@@ -311,15 +322,17 @@ stock DestroyContainer(containerid, destroyitems = true) {
 
 	Iter_Remove(cnt_Index, containerid);
 
-	return 1;
+	return 0;
 }
 
 stock AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID) {
 	if(!Iter_Contains(cnt_Index, containerid)) {
+		err("attempt to add item to nonexistent container");
 		return -1;
 	}
 
 	if(!IsValidItem(itemid)) {
+		err("attempt to add nonexistent item to container");
 		return -2;
 	}
 
@@ -333,6 +346,7 @@ stock AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID) {
 		}
 
 		if(cnt_Items[containerid][idx] == itemid) {
+			err("attempt to add an item to a container that it is already in");
 			return -3;
 		}
 
@@ -350,10 +364,11 @@ stock AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID) {
 		return -4;
 	}
 
-	if(cnt_ItemContainer[itemid] != INVALID_CONTAINER_ID)
-	{
-		if(!RemoveItemFromContainer(cnt_ItemContainer[itemid], cnt_ItemContainerSlot[itemid]))
+	if(cnt_ItemContainer[itemid] != INVALID_CONTAINER_ID) {
+		if(!RemoveItemFromContainer(cnt_ItemContainer[itemid], cnt_ItemContainerSlot[itemid])) {
+			err("failed to remove item from the container it was already in");
 			return -5;
+		}
 	}
 
 	cnt_Items[containerid][idx] = itemid;
@@ -427,7 +442,7 @@ stock RemoveItemFromContainer(containerid, slotid, playerid = INVALID_PLAYER_ID,
 	return 0;
 }
 
-stock IsValidContainer(containerid) {
+stock bool:IsValidContainer(containerid) {
 	if(!Iter_Contains(cnt_Index, containerid)) {
 		return false;
 	}
@@ -442,156 +457,175 @@ stock GetContainerName(containerid, name[]) {
 	}
 
 	name[0] = EOS;
-	strcat(name, cnt_Data[containerid][cnt_name], CNT_MAX_NAME);
+	strcat(name, cnt_Data[containerid][cnt_name], MAX_CONTAINER_NAME);
+	return 0;
+}
 
+stock SetContainerName(containerid, name[]) {
+	if(!Iter_Contains(cnt_Index, containerid)) {
+		return 1;
+	}
+
+	cnt_Data[containerid][cnt_name][0] = EOS;
+	strcat(cnt_Data[containerid][cnt_name], name, MAX_CONTAINER_NAME);
 	return 0;
 }
 
 // cnt_size
-stock GetContainerSize(containerid)
-{
-
-	if(!Iter_Contains(cnt_Index, containerid))
-		return -1;
-
-	return cnt_Data[containerid][cnt_size];
-}
-stock SetContainerSize(containerid, size)
-{
-
-	if(!Iter_Contains(cnt_Index, containerid))
-		return 0;
-
-	cnt_Data[containerid][cnt_size] = size;
-
-	return 1;
-}
-
-stock GetContainerItemCount(containerid)
-{
-
-	if(!Iter_Contains(cnt_Index, containerid))
-		return 0;
-
-	new size;
-
-	while(size < cnt_Data[containerid][cnt_size])
-	{
-		if(!IsValidItem(cnt_Items[containerid][size]))
-			break;
-
-		size++;
+stock GetContainerSize(containerid, &size) {
+	if(!Iter_Contains(cnt_Index, containerid)) {
+		return 1;
 	}
 
-	return size;
+	size =cnt_Data[containerid][cnt_size];
+	return 0;
+}
+
+stock SetContainerSize(containerid, size) {
+	if(!Iter_Contains(cnt_Index, containerid)) {
+		return 1;
+	}
+
+	cnt_Data[containerid][cnt_size] = size;
+	return 0;
+}
+
+stock GetContainerItemCount(containerid, &count) {
+	if(!Iter_Contains(cnt_Index, containerid)) {
+		return 1;
+	}
+
+	count = 0;
+	while(count < cnt_Data[containerid][cnt_size]) {
+		if(!IsValidItem(cnt_Items[containerid][count])) {
+			break;
+		}
+
+		count++;
+	}
+
+	return 0;
 }
 
 // cnt_Items
-stock GetContainerSlotItem(containerid, slotid)
-{
+stock GetContainerSlotItem(containerid, slotid, &itemid) {
+	if(!Iter_Contains(cnt_Index, containerid)) {
+		return 1;
+	}
 
-	if(!Iter_Contains(cnt_Index, containerid))
-		return INVALID_ITEM_ID;
+	if(!(0 <= slotid < MAX_CONTAINER_SLOTS)) {
+		return 2;
+	}
 
-	if(!(0 <= slotid < CNT_MAX_SLOTS))
-		return INVALID_ITEM_ID;
+	itemid = cnt_Items[containerid][slotid];
 
-	return cnt_Items[containerid][slotid];
+	return 0;
 }
 
-stock IsContainerSlotUsed(containerid, slotid)
-{
+stock bool:IsContainerSlotUsed(containerid, slotid) {
+	if(!(0 <= slotid < MAX_CONTAINER_SLOTS)) {
+		return false;
+	}
 
-	if(!(0 <= slotid < CNT_MAX_SLOTS))
-		return -1;
+	if(!IsValidItem(cnt_Items[containerid][slotid])) {
+		return false;
+	}
 
-	if(!IsValidItem(cnt_Items[containerid][slotid]))
-		return 0;
-
-	return 1;
+	return true;
 }
 
-stock IsContainerFull(containerid)
-{
+stock bool:IsContainerFull(containerid) {
+	if(!Iter_Contains(cnt_Index, containerid)) {
+		return false;
+	}
 
-	if(!Iter_Contains(cnt_Index, containerid))
-		return 0;
+	new slots, ret;
+	ret = GetContainerFreeSlots(containerid, slots);
+	if(ret != 0) {
+		err("GetContainerFreeSlots failed",
+			_i("ret", ret));
+		return false;
+	}
 
-	return GetContainerFreeSlots(containerid) == 0;
+	return slots == 0;
 }
 
-stock IsContainerEmpty(containerid)
-{
-
-	if(!Iter_Contains(cnt_Index, containerid))
-		return 0;
+stock bool:IsContainerEmpty(containerid) {
+	if(!Iter_Contains(cnt_Index, containerid)) {
+		return false;
+	}
 
 	return !IsValidItem(cnt_Items[containerid][0]);
 }
 
-stock WillItemTypeFitInContainer(containerid, ItemType:itemtype)
-{
+stock ContainerFitsItemType(containerid, ItemType:itemtype, &bool:result) {
+	if(!Iter_Contains(cnt_Index, containerid)) {
+		return 1;
+	}
 
-	if(!Iter_Contains(cnt_Index, containerid))
-		return 0;
+	if(!IsValidItemType(itemtype)) {
+		return 2;
+	}
 
 	new
 		slots,
 		idx;
 
-	while(idx < cnt_Data[containerid][cnt_size])
-	{
-		if(!IsValidItem(cnt_Items[containerid][idx]))
+	while(idx < cnt_Data[containerid][cnt_size]) {
+		if(!IsValidItem(cnt_Items[containerid][idx])) {
 			break;
+		}
 
 		slots += GetItemTypeSize(GetItemType(cnt_Items[containerid][idx]));
 		idx++;
 	}
 
-	if(slots + GetItemTypeSize(itemtype) > cnt_Data[containerid][cnt_size])
-		return 0;
+	if(slots + GetItemTypeSize(itemtype) > cnt_Data[containerid][cnt_size]) {
+		result = false;
+	} else {
+		result = true;
+	}
 
-	return 1;
+	return 0;
 }
 
-stock GetContainerFreeSlots(containerid)
-{
-
-	if(!Iter_Contains(cnt_Index, containerid))
-		return 0;
+stock GetContainerFreeSlots(containerid, &slots) {
+	if(!Iter_Contains(cnt_Index, containerid)) {
+		return 1;
+	}
 
 	new
-		slots,
 		idx;
 
-	while(idx < cnt_Data[containerid][cnt_size])
-	{
-		if(!IsValidItem(cnt_Items[containerid][idx]))
+	while(idx < cnt_Data[containerid][cnt_size]) {
+		if(!IsValidItem(cnt_Items[containerid][idx])) {
 			break;
+		}
 
 		slots += GetItemTypeSize(GetItemType(cnt_Items[containerid][idx]));
 		idx++;
 	}
 
-	return cnt_Data[containerid][cnt_size] - slots;
+	slots = cnt_Data[containerid][cnt_size] - slots;
+	return 0;
 }
 
-stock GetItemContainer(itemid)
-{
+stock GetItemContainer(itemid, &containerid) {
+	if(!IsValidItem(itemid)) {
+		return 1;
+	}
 
-	if(!IsValidItem(itemid))
-		return INVALID_CONTAINER_ID;
-
-	return cnt_ItemContainer[itemid];
+	containerid = cnt_ItemContainer[itemid];
+	return 0;
 }
 
-stock GetItemContainerSlot(itemid)
-{
+stock GetItemContainerSlot(itemid, &slot) {
+	if(!IsValidItem(itemid)) {
+		return 1;
+	}
 
-	if(!IsValidItem(itemid))
-		return INVALID_CONTAINER_ID;
-
-	return cnt_ItemContainerSlot[itemid];
+	slot = cnt_ItemContainerSlot[itemid];
+	return 0;
 }
 
 
