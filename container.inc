@@ -68,7 +68,7 @@ Removes a container from memory and frees the ID.
 - destroyitems: If true, items inside will also be deleted.
 */
 
-forward AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID);
+forward AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID, call = true);
 /*
 # Description
 Adds an item to a container list, calls OnItemAddToContainer.
@@ -306,7 +306,7 @@ stock DestroyContainer(containerid, destroyitems = true) {
 	return 0;
 }
 
-stock AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID) {
+stock AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID, call = true) {
 	if(!Iter_Contains(cnt_Index, containerid)) {
 		err("attempt to add item to nonexistent container");
 		return -1;
@@ -341,8 +341,10 @@ stock AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID) {
 		return (itemsize + slots) - cnt_Data[containerid][cnt_size];
 	}
 
-	if(CallLocalFunction("OnItemAddToContainer", "ddd", containerid, itemid, playerid)) {
-		return -4;
+	if(call) {
+		if(CallLocalFunction("OnItemAddToContainer", "ddd", containerid, itemid, playerid)) {
+			return -4;
+		}
 	}
 
 	if(cnt_ItemContainer[itemid] != INVALID_CONTAINER_ID) {
@@ -359,7 +361,9 @@ stock AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID) {
 	RemoveItemFromWorld(itemid);
 	RemoveCurrentItem(GetItemHolder(itemid));
 
-	CallLocalFunction("OnItemAddedToContainer", "ddd", containerid, itemid, playerid);
+	if(call) {
+		CallLocalFunction("OnItemAddedToContainer", "ddd", containerid, itemid, playerid);
+	}
 	
 	return 0;
 }
