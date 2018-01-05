@@ -12,10 +12,7 @@
 
 #include <a_samp>
 #include <logger>
-#include <YSI\y_iterate>
-#include <YSI\y_timers>
 #include <item>
-
 #include <YSI\y_hooks>
 
 
@@ -245,8 +242,8 @@ static enum E_CONTAINER_DATA {
 static
 	cnt_Data[MAX_CONTAINER][E_CONTAINER_DATA],
 	cnt_Items[MAX_CONTAINER][MAX_CONTAINER_SLOTS],
-	cnt_ItemContainer[ITM_MAX] = {INVALID_CONTAINER_ID, ...},
-	cnt_ItemContainerSlot[ITM_MAX] = {-1, ...};
+	cnt_ItemContainer[MAX_ITEM] = {INVALID_CONTAINER_ID, ...},
+	cnt_ItemContainerSlot[MAX_ITEM] = {-1, ...};
 
 new
 	Iterator:cnt_Index<MAX_CONTAINER>; // exported publically to facilitate iterating through containers
