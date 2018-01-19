@@ -30,4 +30,4 @@ To test, simply run the package:
 sampctl package run
 ```
 
-And connect to `localhost:7777` to test.
+And observe the y_testing output.
