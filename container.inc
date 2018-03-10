@@ -632,3 +632,8 @@ hook OnItemCreateInWorld(itemid) {
 		RemoveItemFromContainer(cnt_ItemContainer[itemid], cnt_ItemContainerSlot[itemid]);
 	}
 }
+
+hook OnItemCreate(itemid) {
+	cnt_ItemContainer[itemid] = INVALID_CONTAINER_ID;
+	cnt_ItemContainerSlot[itemid] = -1;
+}
