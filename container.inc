@@ -318,6 +318,7 @@ stock AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID, call
 	}
 
 	new
+		itemsize,
 		slots,
 		idx;
 
@@ -331,11 +332,12 @@ stock AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID, call
 			return -3;
 		}
 
-		slots += GetItemTypeSize(GetItemType(cnt_Items[containerid][idx]));
+		GetItemTypeSize(GetItemType(cnt_Items[containerid][idx]), itemsize);
+		slots += itemsize;
 		idx++;
 	}
 
-	new itemsize = GetItemTypeSize(GetItemType(itemid));
+	GetItemTypeSize(GetItemType(itemid), itemsize);
 
 	if((itemsize + slots) > cnt_Data[containerid][cnt_size]) {
 		return (itemsize + slots) - cnt_Data[containerid][cnt_size];
@@ -553,6 +555,7 @@ stock ContainerFitsItemType(containerid, ItemType:itemtype, &bool:result) {
 	}
 
 	new
+		itemsize,
 		slots,
 		idx;
 
@@ -561,11 +564,13 @@ stock ContainerFitsItemType(containerid, ItemType:itemtype, &bool:result) {
 			break;
 		}
 
-		slots += GetItemTypeSize(GetItemType(cnt_Items[containerid][idx]));
+		GetItemTypeSize(GetItemType(cnt_Items[containerid][idx]), itemsize);
+		slots += itemsize;
 		idx++;
 	}
 
-	if(slots + GetItemTypeSize(itemtype) > cnt_Data[containerid][cnt_size]) {
+	GetItemTypeSize(itemtype, itemsize);
+	if(slots + itemsize > cnt_Data[containerid][cnt_size]) {
 		result = false;
 	} else {
 		result = true;
@@ -580,6 +585,7 @@ stock GetContainerFreeSlots(containerid, &slots) {
 	}
 
 	new
+		itemsize,
 		idx;
 
 	while(idx < cnt_Data[containerid][cnt_size]) {
@@ -587,7 +593,8 @@ stock GetContainerFreeSlots(containerid, &slots) {
 			break;
 		}
 
-		slots += GetItemTypeSize(GetItemType(cnt_Items[containerid][idx]));
+		GetItemTypeSize(GetItemType(cnt_Items[containerid][idx]), itemsize);
+		slots += itemsize;
 		idx++;
 	}
 
