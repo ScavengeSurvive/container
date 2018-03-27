@@ -350,7 +350,7 @@ stock AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID, call
 	}
 
 	if(cnt_ItemContainer[itemid] != INVALID_CONTAINER_ID) {
-		if(!RemoveItemFromContainer(cnt_ItemContainer[itemid], cnt_ItemContainerSlot[itemid])) {
+		if(RemoveItemFromContainer(cnt_ItemContainer[itemid], cnt_ItemContainerSlot[itemid])) {
 			err("failed to remove item from the container it was already in");
 			return -5;
 		}
