@@ -25,7 +25,7 @@
 
 // Maximum amount of containers that can be created.
 #if !defined MAX_CONTAINER
-	#define MAX_CONTAINER (4096)
+	#define MAX_CONTAINER (Container:4096)
 #endif
 
 // Maximum string length for container names.
@@ -39,13 +39,13 @@
 #endif
 
 
-#define INVALID_CONTAINER_ID (-1)
+#define INVALID_CONTAINER_ID (Container:-1)
 
 
 // Functions
 
 
-forward CreateContainer(name[], size);
+forward Container:CreateContainer(name[], size);
 /*
 # Description
 Creates a container to store items in with a static size.
@@ -59,7 +59,7 @@ ID of the newly created container or INVALID_CONTAINER_ID if the function failed
 due to MAX_CONTAINER limit being reached.
 */
 
-forward DestroyContainer(containerid, destroyitems = true);
+forward DestroyContainer(Container:containerid, destroyitems = true);
 /*
 # Description
 Removes a container from memory and frees the ID.
@@ -68,7 +68,7 @@ Removes a container from memory and frees the ID.
 - destroyitems: If true, items inside will also be deleted.
 */
 
-forward AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID, call = true);
+forward AddItemToContainer(Container:containerid, Item:itemid, playerid = INVALID_PLAYER_ID, call = true);
 /*
 # Description
 Adds an item to a container list, calls OnItemAddToContainer.
@@ -84,7 +84,7 @@ returned non-zero, -5 if item is inside another container, -6 if item is inside
 a player inventory from the SIF/Inventory module.
 */
 
-forward RemoveItemFromContainer(containerid, slotid, playerid = INVALID_PLAYER_ID, call = 1);
+forward RemoveItemFromContainer(Container:containerid, slotid, playerid = INVALID_PLAYER_ID, call = 1);
 /*
 # Description
 Removes an item from a container slot.
@@ -95,13 +95,13 @@ Removes an item from a container slot.
 - call: If true, will call OnItemRemoveFromContainer
 */
 
-forward bool:IsValidContainer(containerid);
+forward bool:IsValidContainer(Container:containerid);
 /*
 # Description
 Checks if a container ID is valid.
 */
 
-forward GetContainerName(containerid, name[]);
+forward GetContainerName(Container:containerid, name[]);
 /*
 # Description
 Returns a container's name.
@@ -110,7 +110,7 @@ Returns a container's name.
 Zero on success, non-zero if error.
 */
 
-forward SetContainerName(containerid, name[]);
+forward SetContainerName(Container:containerid, name[]);
 /*
 # Description
 Updates a container's name
@@ -119,13 +119,13 @@ Updates a container's name
 Zero on success, non-zero if error.
 */
 
-forward GetContainerSize(containerid, &size);
+forward GetContainerSize(Container:containerid, &size);
 /*
 # Description
 Returns a container's item capacity.
 */
 
-forward SetContainerSize(containerid, size);
+forward SetContainerSize(Container:containerid, size);
 /*
 # Description
 Sets a container's item capacity.
@@ -134,55 +134,55 @@ Sets a container's item capacity.
 Zero on success, non-zero if error.
 */
 
-forward GetContainerItemCount(containerid, &count);
+forward GetContainerItemCount(Container:containerid, &count);
 /*
 # Description
 Returns the amount of items inside a container.
 */
 
-forward GetContainerSlotItem(containerid, slotid, &itemid);
+forward GetContainerSlotItem(Container:containerid, slotid, &Item:itemid);
 /*
 # Description
 Returns the item stored in the specified slot.
 */
 
-forward bool:IsContainerSlotUsed(containerid, slotid);
+forward bool:IsContainerSlotUsed(Container:containerid, slotid);
 /*
 # Description
 Checks if a slot in a container is occupied by an item.
 */
 
-forward bool:IsContainerFull(containerid);
+forward bool:IsContainerFull(Container:containerid);
 /*
 # Description
 Checks if a container is full.
 */
 
-forward bool:IsContainerEmpty(containerid);
+forward bool:IsContainerEmpty(Container:containerid);
 /*
 # Description
 Checks if a container is empty.
 */
 
-forward ContainerFitsItemType(containerid, ItemType:itemtype, &bool:result);
+forward ContainerFitsItemType(Container:containerid, ItemType:itemtype, &bool:result);
 /*
 # Description
 Checks if an item type will fit into a container.
 */
 
-forward GetContainerFreeSlots(containerid, &slots);
+forward GetContainerFreeSlots(Container:containerid, &slots);
 /*
 # Description
 Returns the number of free item slots in a container.
 */
 
-forward GetItemContainer(itemid, &containerid);
+forward GetItemContainer(Item:itemid, &Container:containerid);
 /*
 # Description
 Returns the ID of the container that itemid is stored in.
 */
 
-forward GetItemContainerSlot(itemid, &slot);
+forward GetItemContainerSlot(Item:itemid, &slot);
 /*
 # Description
 Returns the container slot that the item is stored in if inside a container.
@@ -192,19 +192,19 @@ Returns the container slot that the item is stored in if inside a container.
 // Events
 
 
-forward OnContainerCreate(containerid);
+forward OnContainerCreate(Container:containerid);
 /*
 # Called
 Upon the creation of a container.
 */
 
-forward OnContainerDestroy(containerid);
+forward OnContainerDestroy(Container:containerid);
 /*
 # Called
 Upon the destruction of a container.
 */
 
-forward OnItemAddToContainer(containerid, itemid, playerid);
+forward OnItemAddToContainer(Container:containerid, Item:itemid, playerid);
 /*
 # Called
 When an item is added to a container. Note that the item won't actually be in the container list when this is called.
@@ -213,13 +213,13 @@ When an item is added to a container. Note that the item won't actually be in th
 1 to cancel the item being added.
 */
 
-forward OnItemAddedToContainer(containerid, itemid, playerid);
+forward OnItemAddedToContainer(Container:containerid, Item:itemid, playerid);
 /*
 # Called
 After an item has been added to a container.
 */
 
-forward OnItemRemoveFromContainer(containerid, slotid, playerid);
+forward OnItemRemoveFromContainer(Container:containerid, slotid, playerid);
 /*
 # Called
 As an item is removed from a container. Note that the item will still be in the container list when this is called.
@@ -228,7 +228,7 @@ As an item is removed from a container. Note that the item will still be in the 
 1 to cancel the item being removed.
 */
 
-forward OnItemRemovedFromContainer(containerid, slotid, playerid);
+forward OnItemRemovedFromContainer(Container:containerid, slotid, playerid);
 /*
 # Called
 After an item has been removed from a container.
@@ -241,18 +241,18 @@ static enum E_CONTAINER_DATA {
 
 static
 	cnt_Data[MAX_CONTAINER][E_CONTAINER_DATA],
-	cnt_Items[MAX_CONTAINER][MAX_CONTAINER_SLOTS],
-	cnt_ItemContainer[MAX_ITEM] = {INVALID_CONTAINER_ID, ...},
+	Item:cnt_Items[MAX_CONTAINER][MAX_CONTAINER_SLOTS],
+	Container:cnt_ItemContainer[MAX_ITEM] = {INVALID_CONTAINER_ID, ...},
 	cnt_ItemContainerSlot[MAX_ITEM] = {-1, ...};
 
-new
-	Iterator:cnt_Index<MAX_CONTAINER>; // exported publically to facilitate iterating through containers
+// exported publically to facilitate iterating through containers
+new Iterator:cnt_Index<_:MAX_CONTAINER>;
 
 
-stock CreateContainer(name[], size) {
-	new id = Iter_Free(cnt_Index);
+stock Container:CreateContainer(name[], size) {
+	new Container:id = Container:Iter_Free(cnt_Index);
 
-	if(id == ITER_NONE) {
+	if(_:id == ITER_NONE) {
 		err("container limit reached");
 		return INVALID_CONTAINER_ID;
 	}
@@ -272,19 +272,19 @@ stock CreateContainer(name[], size) {
 		cnt_Items[id][i] = INVALID_ITEM_ID;
 	}
 
-	Iter_Add(cnt_Index, id);
+	Iter_Add(cnt_Index, _:id);
 
-	CallLocalFunction("OnContainerCreate", "d", id);
+	CallLocalFunction("OnContainerCreate", "d", _:id);
 
 	return id;
 }
 
-stock DestroyContainer(containerid, destroyitems = true) {
-	if(!Iter_Contains(cnt_Index, containerid)) {
+stock DestroyContainer(Container:containerid, destroyitems = true) {
+	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return 1;
 	}
 
-	CallLocalFunction("OnContainerDestroy", "d", containerid);
+	CallLocalFunction("OnContainerDestroy", "d", _:containerid);
 
 	if(destroyitems) {
 		for(new i; i < cnt_Data[containerid][cnt_size]; i++) {
@@ -301,13 +301,13 @@ stock DestroyContainer(containerid, destroyitems = true) {
 	cnt_Data[containerid][cnt_name][0]	= EOS;
 	cnt_Data[containerid][cnt_size]		= 0;
 
-	Iter_Remove(cnt_Index, containerid);
+	Iter_Remove(cnt_Index, _:containerid);
 
 	return 0;
 }
 
-stock AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID, call = true) {
-	if(!Iter_Contains(cnt_Index, containerid)) {
+stock AddItemToContainer(Container:containerid, Item:itemid, playerid = INVALID_PLAYER_ID, call = true) {
+	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		err("attempt to add item to nonexistent container");
 		return -1;
 	}
@@ -344,7 +344,7 @@ stock AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID, call
 	}
 
 	if(call) {
-		if(CallLocalFunction("OnItemAddToContainer", "ddd", containerid, itemid, playerid)) {
+		if(CallLocalFunction("OnItemAddToContainer", "ddd", _:containerid, _:itemid, playerid)) {
 			return -4;
 		}
 	}
@@ -364,13 +364,13 @@ stock AddItemToContainer(containerid, itemid, playerid = INVALID_PLAYER_ID, call
 	RemoveCurrentItem(GetItemHolder(itemid));
 
 	if(call) {
-		CallLocalFunction("OnItemAddedToContainer", "ddd", containerid, itemid, playerid);
+		CallLocalFunction("OnItemAddedToContainer", "ddd", _:containerid, _:itemid, playerid);
 	}
 	
 	return 0;
 }
 
-stock RemoveItemFromContainer(containerid, slotid, playerid = INVALID_PLAYER_ID, call = 1) {
+stock RemoveItemFromContainer(Container:containerid, slotid, playerid = INVALID_PLAYER_ID, call = 1) {
 	if(!(0 <= slotid < cnt_Data[containerid][cnt_size])) {
 		return 1;
 	}
@@ -378,8 +378,8 @@ stock RemoveItemFromContainer(containerid, slotid, playerid = INVALID_PLAYER_ID,
 	if(!IsValidItem(cnt_Items[containerid][slotid])) {
 		if(cnt_Items[containerid][slotid] != INVALID_ITEM_ID) {
 			err("found container slot with non-invalid item ID but no valid item present, cleaning up",
-				_i("containerid", containerid),
-				_i("itemid", cnt_Items[containerid][slotid]),
+				_i("containerid", _:containerid),
+				_i("itemid", _:cnt_Items[containerid][slotid]),
 				_i("slotid", slotid));
 
 			cnt_Items[containerid][slotid] = INVALID_ITEM_ID;
@@ -401,7 +401,7 @@ stock RemoveItemFromContainer(containerid, slotid, playerid = INVALID_PLAYER_ID,
 	}
 
 	if(call) {
-		if(CallLocalFunction("OnItemRemoveFromContainer", "ddd", containerid, slotid, playerid)) {
+		if(CallLocalFunction("OnItemRemoveFromContainer", "ddd", _:containerid, slotid, playerid)) {
 			return 0;
 		}
 	}
@@ -423,14 +423,14 @@ stock RemoveItemFromContainer(containerid, slotid, playerid = INVALID_PLAYER_ID,
 	}
 
 	if(call) {
-		CallLocalFunction("OnItemRemovedFromContainer", "ddd", containerid, slotid, playerid);
+		CallLocalFunction("OnItemRemovedFromContainer", "ddd", _:containerid, slotid, playerid);
 	}
 
 	return 0;
 }
 
-stock bool:IsValidContainer(containerid) {
-	if(!Iter_Contains(cnt_Index, containerid)) {
+stock bool:IsValidContainer(Container:containerid) {
+	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return false;
 	}
 
@@ -438,8 +438,8 @@ stock bool:IsValidContainer(containerid) {
 }
 
 // cnt_name
-stock GetContainerName(containerid, name[]) {
-	if(!Iter_Contains(cnt_Index, containerid)) {
+stock GetContainerName(Container:containerid, name[]) {
+	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return 1;
 	}
 
@@ -448,8 +448,8 @@ stock GetContainerName(containerid, name[]) {
 	return 0;
 }
 
-stock SetContainerName(containerid, name[]) {
-	if(!Iter_Contains(cnt_Index, containerid)) {
+stock SetContainerName(Container:containerid, name[]) {
+	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return 1;
 	}
 
@@ -459,8 +459,8 @@ stock SetContainerName(containerid, name[]) {
 }
 
 // cnt_size
-stock GetContainerSize(containerid, &size) {
-	if(!Iter_Contains(cnt_Index, containerid)) {
+stock GetContainerSize(Container:containerid, &size) {
+	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return 1;
 	}
 
@@ -468,8 +468,8 @@ stock GetContainerSize(containerid, &size) {
 	return 0;
 }
 
-stock SetContainerSize(containerid, size) {
-	if(!Iter_Contains(cnt_Index, containerid)) {
+stock SetContainerSize(Container:containerid, size) {
+	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return 1;
 	}
 
@@ -477,8 +477,8 @@ stock SetContainerSize(containerid, size) {
 	return 0;
 }
 
-stock GetContainerItemCount(containerid, &count) {
-	if(!Iter_Contains(cnt_Index, containerid)) {
+stock GetContainerItemCount(Container:containerid, &count) {
+	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return 1;
 	}
 
@@ -495,8 +495,8 @@ stock GetContainerItemCount(containerid, &count) {
 }
 
 // cnt_Items
-stock GetContainerSlotItem(containerid, slotid, &itemid) {
-	if(!Iter_Contains(cnt_Index, containerid)) {
+stock GetContainerSlotItem(Container:containerid, slotid, &Item:itemid) {
+	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return 1;
 	}
 
@@ -509,7 +509,7 @@ stock GetContainerSlotItem(containerid, slotid, &itemid) {
 	return 0;
 }
 
-stock bool:IsContainerSlotUsed(containerid, slotid) {
+stock bool:IsContainerSlotUsed(Container:containerid, slotid) {
 	if(!(0 <= slotid < MAX_CONTAINER_SLOTS)) {
 		return false;
 	}
@@ -521,8 +521,8 @@ stock bool:IsContainerSlotUsed(containerid, slotid) {
 	return true;
 }
 
-stock bool:IsContainerFull(containerid) {
-	if(!Iter_Contains(cnt_Index, containerid)) {
+stock bool:IsContainerFull(Container:containerid) {
+	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return false;
 	}
 
@@ -537,16 +537,16 @@ stock bool:IsContainerFull(containerid) {
 	return slots == 0;
 }
 
-stock bool:IsContainerEmpty(containerid) {
-	if(!Iter_Contains(cnt_Index, containerid)) {
+stock bool:IsContainerEmpty(Container:containerid) {
+	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return false;
 	}
 
 	return !IsValidItem(cnt_Items[containerid][0]);
 }
 
-stock ContainerFitsItemType(containerid, ItemType:itemtype, &bool:result) {
-	if(!Iter_Contains(cnt_Index, containerid)) {
+stock ContainerFitsItemType(Container:containerid, ItemType:itemtype, &bool:result) {
+	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return 1;
 	}
 
@@ -579,8 +579,8 @@ stock ContainerFitsItemType(containerid, ItemType:itemtype, &bool:result) {
 	return 0;
 }
 
-stock GetContainerFreeSlots(containerid, &slots) {
-	if(!Iter_Contains(cnt_Index, containerid)) {
+stock GetContainerFreeSlots(Container:containerid, &slots) {
+	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return 1;
 	}
 
@@ -602,7 +602,7 @@ stock GetContainerFreeSlots(containerid, &slots) {
 	return 0;
 }
 
-stock GetItemContainer(itemid, &containerid) {
+stock GetItemContainer(Item:itemid, &Container:containerid) {
 	if(!IsValidItem(itemid)) {
 		return 1;
 	}
@@ -611,7 +611,7 @@ stock GetItemContainer(itemid, &containerid) {
 	return 0;
 }
 
-stock GetItemContainerSlot(itemid, &slot) {
+stock GetItemContainerSlot(Item:itemid, &slot) {
 	if(!IsValidItem(itemid)) {
 		return 1;
 	}
@@ -628,19 +628,19 @@ stock GetItemContainerSlot(itemid, &slot) {
 ==============================================================================*/
 
 
-hook OnItemDestroy(itemid) {
+hook OnItemDestroy(Item:itemid) {
 	if(cnt_ItemContainer[itemid] != INVALID_CONTAINER_ID) {
 		RemoveItemFromContainer(cnt_ItemContainer[itemid], cnt_ItemContainerSlot[itemid]);
 	}
 }
 
-hook OnItemCreateInWorld(itemid) {
+hook OnItemCreateInWorld(Item:itemid) {
 	if(cnt_ItemContainer[itemid] != INVALID_CONTAINER_ID) {
 		RemoveItemFromContainer(cnt_ItemContainer[itemid], cnt_ItemContainerSlot[itemid]);
 	}
 }
 
-hook OnItemCreate(itemid) {
+hook OnItemCreate(Item:itemid) {
 	cnt_ItemContainer[itemid] = INVALID_CONTAINER_ID;
 	cnt_ItemContainerSlot[itemid] = -1;
 }
