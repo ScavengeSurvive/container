@@ -45,7 +45,7 @@
 // Functions
 
 
-forward Container:CreateContainer(name[], size);
+forward Container:CreateContainer(const name[], size);
 /*
 # Description
 Creates a container to store items in with a static size.
@@ -245,21 +245,23 @@ static
 	Container:cnt_ItemContainer[MAX_ITEM] = {INVALID_CONTAINER_ID, ...},
 	cnt_ItemContainerSlot[MAX_ITEM] = {-1, ...};
 
+const CONTAINER_ITER_SIZE = _:MAX_CONTAINER;
+
 // exported publically to facilitate iterating through containers
-new Iterator:cnt_Index<_:MAX_CONTAINER>;
+new Iterator:cnt_Index<CONTAINER_ITER_SIZE>;
 
 
-stock Container:CreateContainer(name[], size) {
+stock Container:CreateContainer(const name[], size) {
 	new Container:id = Container:Iter_Free(cnt_Index);
 
 	if(_:id == ITER_NONE) {
-		err("container limit reached");
+		Logger_Err("container limit reached");
 		return INVALID_CONTAINER_ID;
 	}
 
 	if(size > MAX_CONTAINER_SLOTS || size <= 0) {
-		err("attempt to create a container with invalid size",
-			_i("size", size));
+		Logger_Err("attempt to create a container with invalid size",
+			Logger_I("size", size));
 
 		return INVALID_CONTAINER_ID;
 	}
@@ -308,12 +310,12 @@ stock DestroyContainer(Container:containerid, destroyitems = true) {
 
 stock AddItemToContainer(Container:containerid, Item:itemid, playerid = INVALID_PLAYER_ID, call = true) {
 	if(!Iter_Contains(cnt_Index, _:containerid)) {
-		err("attempt to add item to nonexistent container");
+		Logger_Err("attempt to add item to nonexistent container");
 		return -1;
 	}
 
 	if(!IsValidItem(itemid)) {
-		err("attempt to add nonexistent item to container");
+		Logger_Err("attempt to add nonexistent item to container");
 		return -2;
 	}
 
@@ -328,7 +330,7 @@ stock AddItemToContainer(Container:containerid, Item:itemid, playerid = INVALID_
 		}
 
 		if(cnt_Items[containerid][idx] == itemid) {
-			err("attempt to add an item to a container that it is already in");
+			Logger_Err("attempt to add an item to a container that it is already in");
 			return -3;
 		}
 
@@ -351,7 +353,7 @@ stock AddItemToContainer(Container:containerid, Item:itemid, playerid = INVALID_
 
 	if(cnt_ItemContainer[itemid] != INVALID_CONTAINER_ID) {
 		if(RemoveItemFromContainer(cnt_ItemContainer[itemid], cnt_ItemContainerSlot[itemid])) {
-			err("failed to remove item from the container it was already in");
+			Logger_Err("failed to remove item from the container it was already in");
 			return -5;
 		}
 	}
@@ -377,10 +379,10 @@ stock RemoveItemFromContainer(Container:containerid, slotid, playerid = INVALID_
 
 	if(!IsValidItem(cnt_Items[containerid][slotid])) {
 		if(cnt_Items[containerid][slotid] != INVALID_ITEM_ID) {
-			err("found container slot with non-invalid item ID but no valid item present, cleaning up",
-				_i("containerid", _:containerid),
-				_i("itemid", _:cnt_Items[containerid][slotid]),
-				_i("slotid", slotid));
+			Logger_Err("found container slot with non-invalid item ID but no valid item present, cleaning up",
+				Logger_I("containerid", _:containerid),
+				Logger_I("itemid", _:cnt_Items[containerid][slotid]),
+				Logger_I("slotid", slotid));
 
 			cnt_Items[containerid][slotid] = INVALID_ITEM_ID;
 
@@ -529,8 +531,8 @@ stock bool:IsContainerFull(Container:containerid) {
 	new slots, ret;
 	ret = GetContainerFreeSlots(containerid, slots);
 	if(ret != 0) {
-		err("GetContainerFreeSlots failed",
-			_i("ret", ret));
+		Logger_Err("GetContainerFreeSlots failed",
+			Logger_I("ret", ret));
 		return false;
 	}
 
