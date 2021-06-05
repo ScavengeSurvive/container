@@ -101,7 +101,7 @@ forward bool:IsValidContainer(Container:containerid);
 Checks if a container ID is valid.
 */
 
-forward GetContainerName(Container:containerid, name[]);
+forward GetContainerName(Container:containerid, const name[]);
 /*
 # Description
 Returns a container's name.
@@ -110,7 +110,7 @@ Returns a container's name.
 Zero on success, non-zero if error.
 */
 
-forward SetContainerName(Container:containerid, name[]);
+forward SetContainerName(Container:containerid, const name[]);
 /*
 # Description
 Updates a container's name
@@ -440,7 +440,7 @@ stock bool:IsValidContainer(Container:containerid) {
 }
 
 // cnt_name
-stock GetContainerName(Container:containerid, name[]) {
+stock GetContainerName(Container:containerid, const name[]) {
 	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return 1;
 	}
@@ -450,7 +450,7 @@ stock GetContainerName(Container:containerid, name[]) {
 	return 0;
 }
 
-stock SetContainerName(Container:containerid, name[]) {
+stock SetContainerName(Container:containerid, const name[]) {
 	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return 1;
 	}
