@@ -110,7 +110,7 @@ Returns a container's name.
 Zero on success, non-zero if error.
 */
 
-forward SetContainerName(Container:containerid, name[]);
+forward SetContainerName(Container:containerid, const name[]);
 /*
 # Description
 Updates a container's name
@@ -450,7 +450,7 @@ stock GetContainerName(Container:containerid, name[]) {
 	return 0;
 }
 
-stock SetContainerName(Container:containerid, name[]) {
+stock SetContainerName(Container:containerid, const name[]) {
 	if(!Iter_Contains(cnt_Index, _:containerid)) {
 		return 1;
 	}
