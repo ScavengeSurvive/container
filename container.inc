@@ -219,7 +219,7 @@ forward OnItemAddedToContainer(Container:containerid, Item:itemid, playerid);
 After an item has been added to a container.
 */
 
-forward OnItemRemoveFromContainer(Container:containerid, slotid, playerid);
+forward OnItemRemoveFromContainer(Container:containerid, slotid, playerid, Item:itemid);
 /*
 # Called
 As an item is removed from a container. Note that the item will still be in the container list when this is called.
@@ -228,7 +228,7 @@ As an item is removed from a container. Note that the item will still be in the 
 1 to cancel the item being removed.
 */
 
-forward OnItemRemovedFromContainer(Container:containerid, slotid, playerid);
+forward OnItemRemovedFromContainer(Container:containerid, slotid, playerid, Item:itemid);
 /*
 # Called
 After an item has been removed from a container.
@@ -402,8 +402,10 @@ stock RemoveItemFromContainer(Container:containerid, slotid, playerid = INVALID_
 		return 2;
 	}
 
+	new Item:itemid = cnt_Items[containerid][slotid];
+	
 	if(call) {
-		if(CallLocalFunction("OnItemRemoveFromContainer", "ddd", _:containerid, slotid, playerid)) {
+		if(CallLocalFunction("OnItemRemoveFromContainer", "dddd", _:containerid, slotid, playerid, _:itemid)) {
 			return 0;
 		}
 	}
@@ -425,7 +427,7 @@ stock RemoveItemFromContainer(Container:containerid, slotid, playerid = INVALID_
 	}
 
 	if(call) {
-		CallLocalFunction("OnItemRemovedFromContainer", "ddd", _:containerid, slotid, playerid);
+		CallLocalFunction("OnItemRemovedFromContainer", "dddd", _:containerid, slotid, playerid, _:itemid);
 	}
 
 	return 0;
