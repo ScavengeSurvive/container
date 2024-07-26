@@ -639,7 +639,7 @@ public OnItemDestroy(Item:itemid)
 		#if defined SS_OnItemDestroy
 				SS_OnItemDestroy(itemid);
 		#endif
-		return 0;
+		return;
 }
 #if defined _ALS_OnItemDestroy
 		#undef OnItemDestroy
@@ -660,7 +660,7 @@ public OnItemCreateInWorld(Item:itemid)
 		#if defined SS_OnItemCreateInWorld
 				SS_OnItemCreateInWorld(itemid);
 		#endif
-		return 1;
+		return;
 }
 #if defined _ALS_OnItemCreateInWorld
 		#undef OnItemCreateInWorld
