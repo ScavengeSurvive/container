@@ -631,18 +631,47 @@ stock GetItemContainerSlot(Item:itemid, &slot) {
 
 ==============================================================================*/
 
+public OnItemDestroy(Item:itemid)
+{
+		if(cnt_ItemContainer[itemid] != INVALID_CONTAINER_ID) {
+			RemoveItemFromContainer(cnt_ItemContainer[itemid], cnt_ItemContainerSlot[itemid]);
+		}
+		#if defined SS_OnItemDestroy
+				SS_OnItemDestroy(itemid);
+		#endif
+		return;
+}
+#if defined _ALS_OnItemDestroy
+		#undef OnItemDestroy
+#else
+		#define _ALS_OnItemDestroy
+#endif
+#define OnItemDestroy SS_OnItemDestroy
+#if defined SS_OnItemDestroy
+		forward SS_OnItemDestroy(Item:itemid);
+#endif
 
-hook OnItemDestroy(Item:itemid) {
+
+public OnItemCreateInWorld(Item:itemid)
+{
 	if(cnt_ItemContainer[itemid] != INVALID_CONTAINER_ID) {
 		RemoveItemFromContainer(cnt_ItemContainer[itemid], cnt_ItemContainerSlot[itemid]);
 	}
+		#if defined SS_OnItemCreateInWorld
+				SS_OnItemCreateInWorld(itemid);
+		#endif
+		return;
 }
+#if defined _ALS_OnItemCreateInWorld
+		#undef OnItemCreateInWorld
+#else
+		#define _ALS_OnItemCreateInWorld
+#endif
+#define OnItemCreateInWorld SS_OnItemCreateInWorld
+#if defined SS_OnItemCreateInWorld
+		forward SS_OnItemCreateInWorld(Item:itemid);
+#endif
 
-hook OnItemCreateInWorld(Item:itemid) {
-	if(cnt_ItemContainer[itemid] != INVALID_CONTAINER_ID) {
-		RemoveItemFromContainer(cnt_ItemContainer[itemid], cnt_ItemContainerSlot[itemid]);
-	}
-}
 
 hook OnItemCreate(Item:itemid) {
 	cnt_ItemContainer[itemid] = INVALID_CONTAINER_ID;
