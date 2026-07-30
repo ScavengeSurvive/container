@@ -1,7 +1,7 @@
 #include "container.inc"
 
 #define RUN_TESTS
-#include <YSI\y_testing>
+#include <YSI_Core\y_testing>
 
 
 Test:CreateDestroy() {
@@ -134,40 +134,39 @@ main() {
 
 
 public OnContainerCreate(Container:containerid) {
-	log("OnContainerCreate",
-		_i("containerid", _:containerid));
+	Logger_Log("OnContainerCreate",
+		Logger_I("containerid", _:containerid));
 }
 
 public OnContainerDestroy(Container:containerid) {
-	log("OnContainerDestroy",
-		_i("containerid", _:containerid));
+	Logger_Log("OnContainerDestroy",
+		Logger_I("containerid", _:containerid));
 }
 
 public OnItemAddToContainer(Container:containerid, Item:itemid, playerid) {
-	log("OnItemAddToContainer",
-		_i("containerid", _:containerid),
-		_i("itemid", _:itemid),
-		_i("playerid", playerid));
+	Logger_Log("OnItemAddToContainer",
+		Logger_I("containerid", _:containerid),
+		Logger_I("itemid", _:itemid),
+		Logger_I("playerid", playerid));
 }
 
 public OnItemAddedToContainer(Container:containerid, Item:itemid, playerid) {
-	log("OnItemAddedToContainer",
-		_i("containerid", _:containerid),
-		_i("itemid", _:itemid),
-		_i("playerid", playerid));
+	Logger_Log("OnItemAddedToContainer",
+		Logger_I("containerid", _:containerid),
+		Logger_I("itemid", _:itemid),
+		Logger_I("playerid", playerid));
 }
 
 public OnItemRemoveFromContainer(Container:containerid, slotid, playerid) {
-	log("OnItemRemoveFromContainer",
-		_i("containerid", _:containerid),
-		_i("slotid", slotid),
-		_i("playerid", playerid));
+	Logger_Log("OnItemRemoveFromContainer",
+		Logger_I("containerid", _:containerid),
+		Logger_I("slotid", slotid),
+		Logger_I("playerid", playerid));
 }
 
 public OnItemRemovedFromContainer(Container:containerid, slotid, playerid) {
-	log("OnItemRemovedFromContainer",
-		_i("containerid", _:containerid),
-		_i("slotid", slotid),
-		_i("playerid", playerid));
+	Logger_Log("OnItemRemovedFromContainer",
+		Logger_I("containerid", _:containerid),
+		Logger_I("slotid", slotid),
+		Logger_I("playerid", playerid));
 }
-
